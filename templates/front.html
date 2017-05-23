@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <nav>
+        {% if loggedinusername %}
+            <a href="/blog/newpost" class="link-button">Add a Post</a>
+        {% else %}
+            <a href="/login" class="link-button">Login</a>
+        {% endif %}
+    </nav>
+    {% for p in posts %}
+     {{ p.render() | safe }}
+    {% endfor %}
+
+{% endblock %}

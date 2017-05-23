@@ -1,0 +1,38 @@
+<div class="post col-12">
+  <div class="post-header col-3">
+    <div class="post-heading col-12">
+      <div class="post-title">
+        <a href="/blog/{{p.key().id()}}" class="post-title link-button">{{p.subject}}</a>
+      </div>
+      <div class="post-date col-12">
+        <p>
+          <i class="fa fa-user-o"></i>
+           {{p.username}}
+        </p>
+        <p>
+          <i class="fa fa-truck"></i>
+           {{p.created.strftime("%b %d, %Y")}}
+          <p>  {{p.last_modified.strftime("%I:%M:%S %p")}}</p>
+        </p>
+        <p>
+          <i class="fa fa-pencil"></i>
+           {{p.last_modified.strftime("%b %d, %Y")}}
+           <p>  {{p.last_modified.strftime("%I:%M:%S %p")}}</p>
+        </p>
+      </div>
+      <div class="post-likes col-12">
+        <div class="col-3">
+          <i class="fa fa-thumbs-up"></i> {{plks}}
+        </div>
+        <div class="col-3">
+          <i class="fa fa-thumbs-down"></i> {{pdss}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="post-content col-9">
+    <div class="post-ascii">
+      {{p._render_text | safe}}
+    </div>
+  </div>
+</div>

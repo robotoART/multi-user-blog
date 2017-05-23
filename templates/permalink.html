@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="perma-container com-12">
+    <div class="perma-post-area com-12">
+    <!-- The overlay -->
+    <div id="myNav" class="overlay com-12">
+      <!-- Button to close the overlay navigation -->
+      <a class="closebtn" onclick="closeNav()">&times;</a>
+      <!-- Overlay content -->
+      <div class="overlay-content-post">
+        <h3>Really delete this post?!?</h3>
+        <div class="optbtn">
+            <a class="overlay-button" href="/blog/delete/{{pid}}">Yep</a>
+        </div>
+        <div class="optbtn">
+            <div class="overlay-button" onclick="closeNav()">Nah</div>
+        </div>
+      </div>
+    </div>
+    <section class="perma-post-area">
+    <nav>
+        {% if loggedinusername == pauthor %}
+            <a href="/blog/editpost/{{pid}}" class="link-button">Edit Post</a>
+            <!-- Element to open/show the overlay navigation menu -->
+            <span class="link-button" onclick="openNav()">Delete Post</span>
+        {% elif loggedinusername %}
+            {% if plby == False %}
+                <a href="/blog/like/{{pid}}" class="link-button">
+                    <i class="fa fa-thumbs-up"></i>
+                    Like
+                </a>
+            {% else %}
+            {% endif %}
+            {% if pdby == False %}
+                <a href="/blog/dis/{{pid}}" class="link-button">
+                    <i class="fa fa-thumbs-down"></i>
+                    Dislike
+                </a>
+            {% else %}
+            {% endif %}
+            {% if pdby and plby == True %}
+                <p class="link-button-empty">.</p>
+            {% else %}
+            {% endif %}
+        {% else %}
+            <a href="/login" class="link-button">Login</a>
+        {% endif %}
+    </nav>
+    {{ppost.render() | safe}}
+    </section>
+    <section class="comments-section col-12">
+        <nav class="comments-nav col-12">
+            <div class="nav-comment-btns">
+                {% if loggedinusername %}
+                    <div class="link-button" onclick="toggleAddComment()">Add a Comment</div>
+                {% else %}
+                    <a href="/login" class="link-button">Add a Comment</a>
+                {% endif %}
+            </div>
+        </nav>
+        <div id="addComm" class="add-comm-area">
+            <div class="comm-form">
+                <form method="post">
+                    <label>
+                        <div>comment:</div>
+                        <textarea name="comment" class="comm-textarea">{{comcontent}}</textarea>
+                    </label>
+                    <input type="submit" name="add_com" value="Submit">
+                    <input type="reset" name="reset" value="Reset">
+                    <input type="reset" name="cancel" value="Cancel" onclick="toggleAddComment()">
+                </form>
+            </div>
+        </div>
+        <div class="comments-list">
+            {% for c in comments %}
+                {% include "comment.html" %}
+            {% endfor %}
+        </div>
+    </section>
+    </div>
+</div>
+{% endblock %}

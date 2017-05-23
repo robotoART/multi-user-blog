@@ -1,0 +1,76 @@
+<div class="com-container col-12">
+  <div class="comment col-12">
+    {% if loggedinusername == c.comusername %}
+    <div id="edit{{c.key().id()}}" class="ced-overlay col-12">
+      <form method="post" action="/blog/editcomment/{{c.key().id()}}" class="overlay-edit-comment col-12">
+        <label>
+          <div class="col-12">edit this comment:</div>
+          <textarea id="edit{{c.key().id()}}textarea" name="comedit{{c.key().id()}}" class="comm-edit-textarea col-12"></textarea>
+        </label>
+        <div class="col-12">
+          <input type="submit" name="update_comment" value="Update">
+          <input type="reset" value="Cancel" onclick="closeEditCom('edit{{c.key().id()}}', '{{c.comcontent}}')">
+        </div>
+      </form>
+    </div>
+    <div id="{{c.key().id()}}" class="overlay col-12">
+      <!-- Button to close the delete comment overlay navigation -->
+      <a class="closebtn" onclick="closeComNav({{c.key().id()}})">&times;</a>
+      <div class="overlay-content-comment">
+        <h3>Really delete this comment?!?</h3>
+        <div class="optbtn">
+            <a class="overlay-button" href="/blog/deletecomment/{{c.key().id()}}">Yep</a>
+        </div>
+        <div class="optbtn">
+          <div class="overlay-button" onclick="closeComNav({{c.key().id()}})">Nah</div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    {% endif %}
+    <div class="comment-header col-3">
+      <div class="comment-heading col-12">
+        <div class="comment-date col-12">
+          <p>
+            {% if loggedinusername == c.comusername %}
+              <font color="yellow"><i class="fa fa-user"></i></font>
+              {{c.comusername}}
+              <div class="link-button" onclick="openEditCom('edit{{c.key().id()}}')">Edit </div> |
+              <div class="link-button" onclick="openComNav({{c.key().id()}})"> Delete</div>
+            {% else %}
+              <i class="fa fa-user-o"></i>
+              {{c.comusername}}
+            {% endif %}
+          </p>
+          <p>
+            <i class="fa fa-truck"></i>
+             {{c.created.strftime("%b %d, %Y")}}
+             <p>  {{c.last_modified.strftime("%I:%M:%S %p")}}</p>
+          </p>
+          <!-- TODO: Allow edit feature to comments -->
+          <p>
+            <i class="fa fa-pencil"></i>
+             {{c.last_modified.strftime("%b %d, %Y")}}
+             <p>  {{c.last_modified.strftime("%I:%M:%S %p")}}</p>
+          </p>
+        </div>
+        <!-- TODO: Allow likes for comments -->
+        <!-- <div class="comment-likes col-3">
+          <div class="col-3">
+            <i class="fa fa-thumbs-up"></i> {{plks}}
+          </div>
+          <div class="col-3">
+            <i class="fa fa-thumbs-down"></i> {{pdss}}
+          </div>
+        </div> -->
+        <br>
+        <br>
+      </div>
+    </div>
+    <div class="comment-content col-9">
+      <div class="comment-text">
+        {{c.comcontent | escape}}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,380 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+header {
+    display: flex;
+}
+
+nav {
+    padding-bottom: .125em;
+    border-style: solid;
+    border-color: #333;
+    border-width: 0 0 .125em;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+
+    width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    color: #333;
+    background-color: #999;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+p {
+    margin: 0;
+}
+
+.error {
+    color: red;
+}
+
+.deleted-post, .deleted-comment {
+    color: red;
+}
+
+.delete-confirm {
+    color: red;
+    font-size: 3em;
+    text-align: center;
+}
+
+label {
+  display: block;
+  font-size: 20px;
+}
+
+label + label {
+    margin-top: 20px;
+}
+
+input[name=subject] {
+    width: 100%;
+    font-size: 20px;
+    padding: 2px;
+    font-family: monospace;
+}
+
+textarea {
+  width: 100%;
+  height: 400px;
+  font-size: 17px;
+  font-family: monospace;
+  resize: none;
+  white-space: nowrap;
+}
+
+footer {
+    text-align: center;
+    margin-top: 21px;
+}
+
+.comm-textarea {
+    width: 100%;
+    height: 6em;
+}
+
+.comm-edit-textarea {
+    width: 100%;
+    height: 5.5em;
+}
+
+.container {
+  display: inline-block;
+}
+
+.main-head {
+    display: block;
+}
+
+.main-title {
+    color: #222;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: .25em;
+    text-decoration: none;
+}
+
+.main-top-user {
+    float: right;
+}
+
+.link-button {
+    cursor: pointer;
+    color: #222;
+    font-weight: bold;
+    text-decoration: none;
+    border: 1px;
+    border-color: #222;
+    margin: 3px;
+    display: inline-block;
+    text-align: center;
+}
+
+.link-button-empty {
+    cursor: default;
+    color: #999;
+    text-decoration: none;
+    border: 1px;
+    margin: 3px;
+    display: inline-block;
+    text-align: center;
+    visibility: hidden;
+}
+
+#signing {
+    margin-top: 1em;
+}
+.main-title + .link-button:hover, .link-button:hover, .link-button + .post-title:hover {
+    background-color: #333;
+    color: #999;
+    text-decoration: underline;
+}
+
+.content {
+    display: flex;
+    margin-top: 9px;
+}
+
+.comments-section {
+    display: block;
+    margin-top: 15px;
+    padding-bottom: 15px;
+    border-style: solid;
+    border-color: #333;
+    border-width: 0 0 .125em;
+}
+
+.post, .perma-comments, .comment {
+    display: flex;
+    margin-top: 15px;
+    padding-bottom: 15px;
+    border-style: solid;
+    border-color: #333;
+    border-width: 0 0 .125em;
+}
+
+.com-container , .perma-container {
+    position: relative;
+}
+
+.post + .post {
+    display: flex;
+    margin-top: 21px;
+}
+
+.post-header, .comment-header {
+    display: flex;
+    border-right: 3px solid #666;
+    margin: 3px 3px;
+}
+
+.post-heading, .comment-heading {
+    float: left;
+}
+
+.post-title {
+    margin: 0;
+    bottom: 0;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.post-date, .comment-date {
+    bottom: 0;
+    color: #333;
+}
+
+.post-likes {
+    display: inline-flex;
+}
+
+.post-content, .comment-content {
+    margin: 9px 9px;
+    display: flex;
+}
+
+.post-ascii, .comment-content {
+    display: block;
+    background-color: #fff;
+}
+
+.newpost {
+    margin-bottom: 3px;
+}
+
+.rowst {
+    display: table;
+    width: 100%;
+    vertical-align: middle;
+}
+
+.footer {
+    text-align: center;
+}
+
+.col-1 {
+    width: 8.33%;
+}
+
+.col-2 {
+    width: 16.66%;
+}
+.col-3 {
+    width: 25%;
+}
+.col-4 {
+    width: 33.33%;
+}
+.col-5 {
+    width: 41.66%;
+}
+.col-6 {
+    width: 50%;
+}
+.col-7 {
+    width: 58.33%;
+}
+.col-8 {
+    width: 66.66%;
+}
+.col-9 {
+    width: 75%;
+}
+.col-10 {
+    width: 83.33%;
+}
+.col-11 {
+    width: 91.66%;
+}
+.col-12 {
+    width: 100%;
+}
+
+
+#addComm {
+    display: none;
+    transition: 0.5s;
+}
+
+/* The Overlay (background) */
+.overlay {
+    /* Height & width depends on how you want to reveal the overlay */
+    display: none;
+    height: 0;
+    width: 100%;
+    position: absolute; /* Stay in place */
+    z-index: -1; /* Sit behind */
+    left: 0;
+    top: 0;
+    background-color: #f43; /* redish fallback color */
+    background-color: rgba(255, 68, 51, 0.9); /* redish w/opacity */
+    overflow-y: hidden; /* Disable horizontal scroll */
+    transition: 1s ease; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+
+.ced-overlay {
+    /* Height & width depends on how you want to reveal the overlay */
+    display: none;
+    height: 0;
+    width: 100%;
+    position: absolute; /* Stay in place */
+    z-index: -1; /* Sit behind */
+    left: 0;
+    top: 0;
+    background-color: #999; /* fallback color */
+    background-color: rgba(153, 153, 153, 0.9); /* w/opacity */
+    overflow-y: hidden; /* Disable horizontal scroll */
+    transition: 1s ease; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+
+/* Position the content inside the overlay */
+.overlay-content-post {
+    display: block;
+    position: absolute;
+    width: 100%; /* 100% width */
+    text-align: center; /* Centered text/links */
+    vertical-align: middle;
+    height: 100%;
+    margin-top: 3em;
+}
+
+.overlay-content-comment {
+    position: absolute;
+    width: 100%; /* 100% width */
+    text-align: center; /* Centered text/links */
+    vertical-align: middle;
+    height: 100%;
+}
+
+.overlay-edit-comment {
+    position: absolute;
+    width: 100%; /* 100% width */
+    text-align: left; /* Centered text/links */
+    vertical-align: middle;
+    height: 100%;
+    border-style: dashed;
+    border-color: #333;
+    border-width: .125em 0 .125em;
+}
+
+/* The navigation links inside the overlay */
+.overlay .optbtn {
+    padding: 1px;
+    text-decoration: none;
+    color: #888;
+    display: block; /* Display block instead of inline */
+    transition: 0.3s; /* Transition effects on hover (color) */
+}
+
+.overlay-button {
+    font-size: 30px;
+    cursor: pointer;
+    color: #888;
+    text-decoration: none;
+    border: 1px;
+    border-color: #222;
+    margin: 1px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* When you mouse over the navigation links, change their color */
+.closebtn:hover, .closebtn:focus, .overlay-button:hover {
+    cursor: pointer;
+    color: #fff;
+}
+
+/* Position the close button (top right corner) */
+.overlay .closebtn {
+    position: absolute;
+    top: 15px;
+    right: 30px;
+    font-size: 30px;
+    text-decoration: none;
+    color: #999;
+    z-index: 3;
+}
+
+/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+@media screen and (max-height: 450px) {
+    .overlay a{font-size: 20px}
+    .overlay .closebtn {
+        font-size: 40px;
+        top: 15px;
+        right: 35px;
+    }
+}
