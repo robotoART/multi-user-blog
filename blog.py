@@ -13,25 +13,30 @@ from google.appengine.ext import db
 
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
-                               autoescape = True)
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
+                               autoescape=True)
+
+secret = '111-infinity0+infinity&beyond999'
 
 
-class Utils:
+class Utils(object):
     """ contains global functions commonly used """
-    secret = '111-infinity0+infinity&beyond999'
-
-    def render_str(template, **params):
+    @classmethod
+    def render_str(self, template, **params):
         t = jinja_env.get_template(template)
         return t.render(params)
 
-    def make_secure_val(nonsecure_val):
-        return "%s|%s" % (nonsecure_val, hmac.new(secret, nonsecure_val).hexdigest())
+    @classmethod
+    def make_secure_val(self, nonsecure_val):
+        return "%s|%s" % (nonsecure_val,
+                          hmac.new(secret, nonsecure_val).hexdigest())
 
-    def check_secure_val(secure_val):
+    @classmethod
+    def check_secure_val(self, secure_val):
         val = secure_val.split('|')[0]
-        if secure_val == make_secure_val(val):
+        if secure_val == Utils.make_secure_val(val):
             return val
+
 
 class Handler(webapp2.RequestHandler, Utils):
     """ webapp2.RequestHandler """
@@ -39,14 +44,17 @@ class Handler(webapp2.RequestHandler, Utils):
         self.response.out.write(*a, **kw)
 
     def render_str(self, template, **params):
-        return Utils.render_str(template, **params)
+        usable_string = Utils.render_str(template, **params)
+        return usable_string
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
     def set_secure_cookie(self, name, val):
         cookie_val = Utils.make_secure_val(val)
-        self.response.headers.add_header('Set-Cookie', '%s=%s; Path=/blog' % (name, cookie_val))
+        self.response.headers.add_header('Set-Cookie',
+                                         '%s=%s; Path=/blog' % (name,
+                                                                cookie_val))
 
     def read_secure_cookie(self, name):
         cookie_val = self.request.cookies. get(name)
@@ -58,7 +66,7 @@ class Handler(webapp2.RequestHandler, Utils):
     def logout(self):
         self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/blog')
 
-    #'initialize' function checks if user is loggedin to allow making posts
+    # 'initialize' function checks if user is loggedin to allow making posts
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
@@ -70,89 +78,108 @@ def render_post(response, post):
     response.out.write(post.content)
 
 
-### user functions
+# user functions
 def make_salt(length=5):
     return ''.join(random.choice(letters) for x in xrange(length))
 
-def make_pw_hash(name, pw, salt = None):
+
+def make_pw_hash(name, pw, salt=None):
     if not salt:
         salt = make_salt()
     h = hashlib.sha256(name + pw + salt).hexdigest()
     return '%s,%s' % (salt, h)
 
+
 def valid_pw(name, pw, h):
     salt = h.split(',')[0]
     return h == make_pw_hash(name, pw, salt)
 
-def users_key(group = 'default'):
+
+def users_key(group='default'):
     return db.Key.from_path('users', group)
 
-##### blog stuff
-def blog_key(name = 'default'):
+
+# blog stuff
+def blog_key(name='default'):
     return db.Key.from_path('blogs', name)
 
-### user class
+
+# user class
 class User(db.Model):
     """ this class creates a User object in the database """
-    name = db.StringProperty(required = True)
-    pw_hash = db.StringProperty(required = True)
+    name = db.StringProperty(required=True)
+    pw_hash = db.StringProperty(required=True)
     email = db.StringProperty()
 
     @classmethod
     def by_id(cls, uid):
-        return cls.get_by_id(uid, parent = users_key())
+        return cls.get_by_id(uid, parent=users_key())
+
     @classmethod
     def by_name(cls, name):
         u = cls.all().filter('name = ', name).get()
         return u
+
     @classmethod
-    def register(cls, name, pw, email = None):
+    def register(cls, name, pw, email=None):
         pw_hash = make_pw_hash(name, pw)
-        return User(parent= users_key(), name= name, pw_hash= pw_hash, email= email)
+        return User(parent=users_key(), name=name,
+                    pw_hash=pw_hash, email=email)
+
     @classmethod
     def login(cls, name, pw):
         u = cls.by_name(name)
         if u and valid_pw(name, pw, u.pw_hash):
             return u
 
+
 class Post(db.Model, Utils):
     """ this class creates a Post object related to a User in the database """
-    subject = db.StringProperty(required = True)
-    content = db.TextProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
-    last_modified = db.DateTimeProperty(auto_now_add = True)
-    username = db.StringProperty(required = True)
-    liked_by = db.StringListProperty(required = True)
-    disd_by = db.StringListProperty(required = True)
+    user = db.ReferenceProperty(User, collection_name='user_posts')
+    subject = db.StringProperty(required=True)
+    content = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    last_modified = db.DateTimeProperty(auto_now_add=True)
+    username = db.StringProperty(required=True)
+    liked_by = db.StringListProperty(required=True)
+    disd_by = db.StringListProperty(required=True)
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
-        return Utils.render_str("post.html", p= self, plks= len(self.liked_by), pdss= len(self.disd_by))
+        return Utils.render_str("post.html", p=self, plks=len(self.liked_by),
+                                  pdss=len(self.disd_by))
+
 
 class Comment(db.Model, Utils):
-    """ this class creates a Comment object related to a Post and a User in the database """
-    post = db.ReferenceProperty(Post, collection_name= 'post_comments')
-    comcontent = db.TextProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
-    comusername = db.StringProperty(required = True)
-    last_modified = db.DateTimeProperty(auto_now_add = True)
+    """
+     this class creates a Comment object related to a Post
+     and a User in the database
+    """
+    post = db.ReferenceProperty(Post, collection_name='post_comments')
+    comcontent = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    comusername = db.StringProperty(required=True)
+    last_modified = db.DateTimeProperty(auto_now_add=True)
 
     def render(self):
         self._render_text = self.comcontent.replace('\n', '<br>')
-        return Utils.render_str("comment.html", c= self)
+        return Utils.render_str("comment.html", c=self)
+
 
 class BlogFront(Handler):
     """ this class goes to the front page with the latest 10 Posts """
     def get(self):
-        posts = db.GqlQuery("select * from Post order by created desc limit 10")
+        query_select = "select * from Post order by created desc limit 10"
+        posts = db.GqlQuery(query_select)
         if self.user:
-            self.render('front.html', posts = posts, loggedinusername= self.user.name)
+            self.render('front.html', posts=posts,
+                        loggedinusername=self.user.name)
         else:
-            self.render('front.html', posts = posts )
+            self.render('front.html', posts=posts)
 
 
 class PostPage(Handler):
-    """ this class goes to a specific Post page """
+    """ this class goes to a specific Post permalink page """
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         ppost = db.get(key)
@@ -163,24 +190,25 @@ class PostPage(Handler):
         pdiss_qty = len(pdisd_by)
         plby = False
         pdby = False
-        comments = sorted(ppost.post_comments, key=lambda comments: comments.last_modified, reverse= True)
-
+        comments = sorted(ppost.post_comments,
+                          key=lambda comments: comments.last_modified,
+                          reverse=True)
         if not ppost:
             self.error(404)
             return
-
         if self.user:
             loggeduser = self.user.name
             if pliked_by.count(loggeduser) > 0:
                 plby = True
             if pdisd_by.count(loggeduser) > 0:
                 pdby = True
-
-            self.render("permalink.html", ppost= ppost, plby= plby, pdby= pdby, pls= plikes_qty, pid= post_id,
-                         loggedinusername= loggeduser, pauthor= pauthor, pkey= key,
-                         pds= pdiss_qty, plb= pliked_by, pdb= pdisd_by, comments= comments)
+            self.render("permalink.html", ppost=ppost, plby=plby, pdby=pdby,
+                        pls=plikes_qty, pid=post_id,
+                        loggedinusername=loggeduser, pauthor=pauthor,
+                        pkey=key, pds=pdiss_qty, plb=pliked_by,
+                        pdb=pdisd_by, comments=comments)
         else:
-            self.render("permalink.html", ppost= ppost, comments= comments)
+            self.render("permalink.html", ppost=ppost, comments=comments)
 
     def post(self, post_id):
         if self.request.get('add_com'):
@@ -188,19 +216,20 @@ class PostPage(Handler):
             p = db.get(key)
             comcontent = self.request.get('comment')
             if comcontent and self.user:
-                c = Comment(comcontent= comcontent, comusername= self.user.name, post= key)
+                c = Comment(comcontent=comcontent,
+                            comusername=self.user.name, post=key)
                 c.put()
                 self.redirect('/blog/%s' % str(p.key().id()))
                 return
             else:
-                self.render("permalink.html", ppost= key, comments= comments)
+                self.render("permalink.html", ppost=key, comments=comments)
         else:
             self.redirect('/blog/%s' % str(p.key().id()))
             return
 
 
 class NewPost(Handler):
-    """ this class goes to the New Post Form page and handles new post submissions """
+    """ goes to the New Post Form page and handles new post submissions """
     def get(self):
         if self.user:
             self.render("newpost.html")
@@ -213,19 +242,24 @@ class NewPost(Handler):
         content = self.request.get('content')
         if self.user:
             if subject and content:
-                p = Post(parent= blog_key(), subject= subject, content= content, username= self.user.name)
+                p = Post(parent=blog_key(), subject=subject, content=content,
+                         username=self.user.name)
                 p.put()
                 self.redirect('/blog/%s' % str(p.key().id()))
                 return
             else:
                 error = "subject and content, please!"
-                self.render("newpost.html", subject=subject, content=content, error=error)
+                self.render("newpost.html", subject=subject, content=content,
+                            error=error)
         else:
             self.redirect('/login')
             return
 
+
 class EditPost(Handler):
-    """ this class goes to the Edit Post Form page and handles editing a post submissions """
+    """
+    goes to the Edit Post Form page and handles editing a post submissions
+    """
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
@@ -233,7 +267,7 @@ class EditPost(Handler):
             subject = post.subject
             content = post.content
             if self.user and self.user.name == post.username:
-                self.render("editpost.html", subject= subject, content= content)
+                self.render("editpost.html", subject=subject, content=content)
             elif self.user:
                 self.redirect('/blog/%s' % str(post.key().id()))
                 return
@@ -254,7 +288,7 @@ class EditPost(Handler):
                 if subject and content:
                     p.subject = subject
                     p.content = content
-                    #REGION DEBUGGER used to wipe likes and dislikes
+                    # REGION DEBUGGER used to wipe likes and dislikes
                     # p.liked_by = []
                     # p.disd_by = []
                     p.put()
@@ -262,7 +296,8 @@ class EditPost(Handler):
                     return
                 else:
                     error = "subject and content, please!"
-                    self.render("editpost.html", subject=subject, content=content, error=error)
+                    self.render("editpost.html", subject=subject,
+                                content=content, error=error)
             elif self.user:
                 self.redirect('/blog/%s' % str(p.key().id()))
                 return
@@ -275,7 +310,9 @@ class EditPost(Handler):
 
 
 class EditComment(Handler):
-    """ this class goes to the Edit Comment Form page and handles editing a comment submissions """
+    """
+     handles editing a comment submission
+    """
     def post(self, comment_id):
         edit_com_txtarea_name = 'comedit' + comment_id
         ctextupdate = self.request.get(edit_com_txtarea_name)
@@ -298,6 +335,7 @@ class EditComment(Handler):
         else:
             self.redirect('/blog/%s' % str(cpostid))
             return
+
 
 class DeletePost(Handler):
     """ this class handles deleting a post submission """
@@ -322,6 +360,7 @@ class DeletePost(Handler):
             self.redirect('/blog/%s' % str(pdelete.key().id()))
             return
 
+
 class DeleteComment(Handler):
     """ this class handles deleting a comment submission """
     def get(self, comment_id):
@@ -340,12 +379,13 @@ class DeleteComment(Handler):
             else:
                 self.redirect('/login')
                 return
-        elif cdelete is not None and cpostid == None:
+        elif cdelete is not None and cpostid is None:
             self.redirect('/blog/%s' % str(cpostid))
             return
         else:
             self.redirect('/blog')
             return
+
 
 class LikePost(Handler):
     """ this class handles Liking a post submission """
@@ -354,8 +394,8 @@ class LikePost(Handler):
         plike = db.get(key)
         lpliked_by = plike.liked_by
         luser = plike.username
-
-        if self.user and luser != self.user.name and lpliked_by.count(self.user.name) == 0:
+        if (self.user and luser != self.user.name and
+                lpliked_by.count(self.user.name) == 0):
             lpliked_by.append(self.user.name)
             plike.liked_by = lpliked_by
             plike.put()
@@ -368,6 +408,7 @@ class LikePost(Handler):
             self.redirect('/login')
             return
 
+
 class DisPost(Handler):
     """ this class handles Disliking a post submission """
     def get(self, post_id):
@@ -375,8 +416,8 @@ class DisPost(Handler):
         pdis = db.get(key)
         lpdisd_by = pdis.disd_by
         luser = pdis.username
-
-        if self.user and luser != self.user.name and lpdisd_by.count(self.user.name) == 0:
+        if (self.user and luser != self.user.name and
+                lpdisd_by.count(self.user.name) == 0):
             lpdisd_by.append(self.user.name)
             pdis.disd_by = lpdisd_by
             pdis.put()
@@ -394,13 +435,16 @@ def valid_username(username):
     USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
     return username and USER_RE.match(username)
 
+
 def valid_password(password):
     PASS_RE = re.compile(r"^.{3,20}$")
     return password and PASS_RE.match(password)
 
+
 def valid_email(email):
-    EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+    EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
     return not email or EMAIL_RE.match(email)
+
 
 class Signup(Handler):
     """ handles New User signup submission """
@@ -413,25 +457,20 @@ class Signup(Handler):
         self.password = self.request.get('password')
         self.verify = self.request.get('verify')
         self.email = self.request.get('email')
-
-        params = dict(username = self.username,
-                      email = self.email)
-
+        params = dict(username=self.username,
+                      email=self.email)
         if not valid_username(self.username):
             params['error_username'] = "That's not a valid username."
             have_error = True
-
         if not valid_password(self.password):
             params['error_password'] = "That wasn't a valid password."
             have_error = True
         elif self.password != self.verify:
             params['error_verify'] = "Your passwords didn't match."
             have_error = True
-
         if not valid_email(self.email):
             params['error_email'] = "That's not a valid email."
             have_error = True
-
         if have_error:
             self.render('signup-form.html', **params)
         else:
@@ -442,13 +481,16 @@ class Signup(Handler):
 
 
 class Register(Signup):
-    """ confirms Signup submission does not contain an existing username in the database """
+    """
+    confirms Signup submission does not contain
+    an existing username in the database
+    """
     def done(self):
-        #check that user doesn't exist
+        # check that user doesn't exist
         u = User.by_name(self.username)
         if u:
             msg = 'That user already exists, please try a different Username'
-            self.render('signup-form.html', error_username = msg)
+            self.render('signup-form.html', error_username=msg)
         else:
             u = User.register(self.username, self.password, self.email)
             u.put()
@@ -460,14 +502,13 @@ class Register(Signup):
 class Login(Handler):
     """ handles User Login submission """
     def get(self):
-        #auto-logout a loggedin user if they wander to login page manually
+        # auto-logout a loggedin user if they wander to login page manually
         self.logout()
         self.render('login-form.html')
 
     def post(self):
         username = self.request.get('username')
         password = self.request.get('password')
-
         u = User.login(username, password)
         if u:
             self.login(u)
@@ -489,17 +530,19 @@ class Logout(Handler):
 class Welcome(Handler):
     """ goes to the user welcom page """
     def get(self):
-        #the following 'user' is from the initialize function above
+        # the following 'user' is from the initialize function above
         if self.user:
-            self.render('welcome.html', username = self.user.name)
+            self.render('welcome.html', username=self.user.name)
         else:
             self.redirect('/signup')
             return
+
 
 class MainPage(Handler):
     """ goes to the signup page """
     def get(self):
         self.redirect('/signup')
+
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
@@ -516,4 +559,4 @@ app = webapp2.WSGIApplication([
     ('/blog/dis/([0-9]+)', DisPost),
     ('/blog/deletecomment/([0-9]+)', DeleteComment),
     ('/blog/editcomment/([0-9]+)', EditComment)
-    ],debug=True)
+    ], debug=True)
