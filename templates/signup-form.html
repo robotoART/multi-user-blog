@@ -8,57 +8,50 @@
       <p> Already signed up? <a href="/login">Login</a></p>
     </div>
     <form method="post">
-      <table>
-        <tr>
-          <td class="label">
+      <div class="signing-table">
+        <div class="sf-row">
+          <div class="sf-cell label">
             Username
-          </td>
-          <td>
+          </div>
+          <div class="sf-cell">
             <input type="text" name="username" value="{{username}}">
-          </td>
-          <td class="error">
-            {{error_username}}
-          </td>
-        </tr>
+          </div>
+          <div class="sf-cell error"> {{error_username}}</div>
+        </div>
 
-        <tr>
-          <td class="label">
+        <div class="sf-row">
+          <div class="sf-cell label">
             Password
-          </td>
-          <td>
+          </div>
+          <div class="sf-cell">
             <input type="password" name="password" value="">
-          </td>
-          <td class="error">
-            {{error_password}}
-          </td>
-        </tr>
+          </div>
+          <div class="sf-cell error"> {{error_password}}</div>
+        </div>
 
-        <tr>
-          <td class="label">
+        <div class="sf-row">
+          <div class="sf-cell label">
             Verify Password
-          </td>
-          <td>
+          </div>
+          <div class="sf-cell">
             <input type="password" name="verify" value="">
-          </td>
-          <td class="error">
-            {{error_verify}}
-          </td>
-        </tr>
+          </div>
+          <div class="sf-cell error"> {{error_verify}}</div>
+        </div>
 
-        <tr>
-          <td class="label">
+        <div class="sf-row">
+          <div class="sf-cell label">
             Email (optional)
-          </td>
-          <td>
+          </div>
+          <div class="sf-cell">
             <input type="text" name="email" value="{{email}}">
-          </td>
-          <td class="error">
-            {{error_email}}
-          </td>
-        </tr>
-      </table>
-
-      <input type="submit" value="Signup" id="signing">
+          </div>
+          <div class="sf-cell error"> {{error_email}}</div>
+        </div>
+      </div>
+      <div class="col-12" id="signing">
+        <input type="submit" value="Signup" id="signing">
+      </div>
     </form>
   </div>
 </body>

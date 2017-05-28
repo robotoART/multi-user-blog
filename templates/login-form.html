@@ -8,28 +8,29 @@
       <p> Not signed up yet? <a href="/signup">Signup now!</a></p>
     </div>
     <form method="post">
-      <table>
-        <tr>
-          <td class="label">
+      <div class="signing-table">
+        <div class="sf-row">
+          <div class="sf-cell label">
             Username
-          </td>
-          <td>
+          </div>
+          <div class="sf-cell">
             <input type="text" name="username" value="{{username}}">
-          </td>
-        </tr>
+          </div>
+        </div>
 
-        <tr>
-          <td class="label">
+        <div class="sf-row">
+          <div class="sf-cell label">
             Password
-          </td>
-          <td>
+          </div>
+          <div class="sf-cell">
             <input type="password" name="password" value="">
-          </td>
-        </tr>
-
-      </table>
-      <h4 class="error">{{error}}</h4>
-      <input type="submit" value="Login" id="signing">
+          </div>
+        </div>
+      </div>
+      <div class="col-12" id="signing">
+        <input type="submit" value="Login" id="signing">
+        <h4 class="error">{{error}}</h4>
+      </div>
     </form>
   </div>
 </body>

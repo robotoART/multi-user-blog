@@ -30,6 +30,8 @@ body {
 h2 {
     font-size: 24px;
     font-weight: bold;
+    margin-top: 2em;
+    margin-bottom: .5em;
 }
 
 p {
@@ -38,6 +40,8 @@ p {
 
 .error {
     color: red;
+    margin-left: .5em;
+    text-align: center;
 }
 
 .deleted-post, .deleted-comment {
@@ -134,9 +138,32 @@ footer {
     visibility: hidden;
 }
 
-#signing {
-    margin-top: 1em;
+.entry {
+    display: flex;
+    vertical-align: middle;
+    text-align: center;
+    margin: .25em 0 .25em 0;
 }
+
+.signing-table {
+    display: table;
+    margin-top: .25em;
+    border-spacing: .375em;
+}
+
+.sf-row {
+    display: table-row;
+}
+
+.sf-cell {
+    display: table-cell;
+}
+
+#signing {
+    display: flex;
+    margin-top: .5em;
+}
+
 .main-title + .link-button:hover, .link-button:hover, .link-button + .post-title:hover {
     background-color: #333;
     color: #999;

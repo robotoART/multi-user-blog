@@ -1,5 +1,5 @@
 # multi-user-blog-ascii-art project
-  This is my multi-user blog project to submit to Udacity. Users can post their ascii art, like and/or dislike another user's art, and leave comments on any art post.
+  This is my proof of concept multi-user blog project. Users can post their ascii art, like and/or dislike another user's art, and leave comments on any art post.
 
   The official site is at:
   https://multi-user-blog-ascii-art.appspot.com/blog
